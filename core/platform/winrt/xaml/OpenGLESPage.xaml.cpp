@@ -60,7 +60,6 @@ OpenGLESPage::OpenGLESPage(OpenGLES* openGLES) :
     mOrientation(DisplayOrientations::Landscape)
 {
     InitializeComponent();
-
     Windows::UI::Core::CoreWindow^ window = Windows::UI::Xaml::Window::Current->CoreWindow;
 
     window->VisibilityChanged +=
@@ -82,6 +81,8 @@ OpenGLESPage::OpenGLESPage(OpenGLES* openGLES) :
 
     this->Loaded +=
         ref new Windows::UI::Xaml::RoutedEventHandler(this, &OpenGLESPage::OnPageLoaded);
+    Windows::UI::ViewManagement::ApplicationView::GetForCurrentView()->SetDesiredBoundsMode(
+        Windows::UI::ViewManagement::ApplicationViewBoundsMode::UseCoreWindow);
 
 #if _MSC_VER >= 1900
     /* if (Windows::Foundation::Metadata::ApiInformation::IsTypePresent("Windows.UI.ViewManagement.StatusBar"))
@@ -91,7 +92,7 @@ OpenGLESPage::OpenGLESPage(OpenGLES* openGLES) :
     // If we have a phone contract, hide the status bar
     Window::Current->SetTitleBar(nullptr);
 
-    if (Windows::Foundation::Metadata::ApiInformation::IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
+    //if (Windows::Foundation::Metadata::ApiInformation::IsTypePresent("Windows.Phone.UI.Input.HardwareButtons"))
     {
         SystemNavigationManager::GetForCurrentView()->BackRequested +=
             ref new EventHandler<BackRequestedEventArgs ^>(this, &OpenGLESPage::OnBackButtonPressed);
@@ -164,8 +165,8 @@ void OpenGLESPage::CreateRenderSurface()
     {
         // The app can configure the SwapChainPanel which may boost performance.
         // By default, this template uses the default configuration.
-        mRenderSurface = mOpenGLES->CreateSurface(swapChainPanel, nullptr, nullptr);
-
+        Windows::Foundation::Size customRenderSurfaceSize = Windows::Foundation::Size(1920, 1080);
+        mRenderSurface = mOpenGLES->CreateSurface(swapChainPanel, &customRenderSurfaceSize, nullptr);
         // You can configure the SwapChainPanel to render at a lower resolution and be scaled up to
         // the swapchain panel size. This scaling is often free on mobile hardware.
         //
@@ -486,7 +487,7 @@ void OpenGLESPage::OnBackButtonPressed(Object^ sender, BackRequestedEventArgs^ a
 {
     if (mRenderer)
     {
-        mRenderer->QueueBackButtonEvent();
+        //mRenderer->QueueBackButtonEvent();
         args->Handled = true;
     }
 }
